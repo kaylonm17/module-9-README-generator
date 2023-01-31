@@ -160,14 +160,39 @@ const writeFile = fileContent => {
     return new Promise((resolve, reject) => {
         fs.writeFile('./dist/generated-README.md', fileContent, err => {
             if (err) {
-                reject
+                reject(err);
+                return;
             }
-        })
-    }) 
-}
+
+            resolve({
+                ok: true,
+                message: 'File created!'
+            });
+        });
+    });
+};
 
 // TODO: Create a function to initialize app
-function init() {}
+const init = () => {
+
+    return inquirer.createPromptModule(questions)
+    .then(readmeData => {
+        return readmeData;
+    })
+}
 
 // Function call to initialize app
-init();
+init()
+.then(readmeData => {
+    console.log(readmeData);
+    return generateMarkdown(readmeData);
+})
+.then(pageMD => {
+    return writeFile(pageMD);
+})
+.then(writeFileResponse => {
+    console.log(writeFileResponse.message);
+})
+.catch(err => {
+    console.log(err);
+})
